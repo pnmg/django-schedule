@@ -180,6 +180,16 @@ class Event(models.Model):
         for o in self.occurrences_after():
             return o
     
+class EventInfo(models.Model):
+    """
+    Event name-value pairs for additional information
+    """
+    name = models.CharField(blank=True, max_length=100)
+    value = models.TextField(blank=True)
+    event = models.ForeignKey(Event)
+    
+    class Meta:
+        app_label = 'schedule'
 
 class EventRelationManager(models.Manager):
     '''
