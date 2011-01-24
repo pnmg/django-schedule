@@ -13,6 +13,11 @@ from schedule.models.rules import Rule
 from schedule.models.calendars import Calendar
 from schedule.utils import OccurrenceReplacer
 
+try:
+    import tagging
+except ImportError, e:
+    pass
+
 class EventManager(models.Manager):
 
     def get_for_object(self, content_object, distinction=None, inherit=True):
@@ -179,6 +184,14 @@ class Event(models.Model):
     def next_occurrence(self):
         for o in self.occurrences_after():
             return o
+    
+    def _get_info(self):
+        info = {}
+        infos = EventInfo.objects.filter(event=self)
+        for value in infos:
+            info[value.name] = value.value
+        return info
+    info = property(_get_info)
     
 class EventInfo(models.Model):
     """
@@ -454,3 +467,6 @@ class Occurrence(models.Model):
 
     def __eq__(self, other):
         return self.event == other.event and self.original_start == other.original_start and self.original_end == other.original_end
+
+try: tagging.register(Event)
+except NameError, e: pass
